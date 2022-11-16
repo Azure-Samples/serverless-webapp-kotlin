@@ -1,5 +1,5 @@
 import React, {useReducer} from 'react';
-import {BrowserRouter as Router, Route, Switch,} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes,} from "react-router-dom";
 
 import './App.scss';
 
@@ -19,11 +19,11 @@ const App: React.FunctionComponent = () => {
         <BackendContext.Provider value={[backend, dispatch]}>
             <div className="App">
                 <Router>
-                    <Switch>
-                        <Route exact path="/" component={Home}/>
-                        <Route path="/register" component={ImageUpload}/>
-                        <Route path="/find" component={FindImage}/>
-                    </Switch>
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/register" element={<ImageUpload/>}/>
+                        <Route path="/find" element={<FindImage/>}/>
+                    </Routes>
                 </Router>
             </div>
         </BackendContext.Provider>

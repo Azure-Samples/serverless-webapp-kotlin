@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {useHistory} from "react-router";
+import {useNavigate} from "react-router";
 import {makeStyles} from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ButtonAppBar() {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<boolean>(false);
-    const history = useHistory();
+    const history = useNavigate();
     const [backend, dispatch] = useContext(BackendContext);
 
     const handleChange = (event: React.ChangeEvent<{ value: string }>) => {
@@ -71,7 +71,7 @@ export default function ButtonAppBar() {
     };
 
     const redirectToHome = () => {
-        history.push('/');
+        history('/');
     };
 
     return (

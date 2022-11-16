@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button} from "@material-ui/core";
-import {useHistory} from "react-router";
+import {useNavigate} from "react-router";
 import ButtonAppBar from "./Header";
 
 type FormButton = {
@@ -9,14 +9,14 @@ type FormButton = {
 }
 
 const FormButtons: React.FunctionComponent<FormButton> = ({registerColor, findColor}) => {
-    const history = useHistory();
+    const history = useNavigate();
 
     const handleShowRegister = () => {
-        history.push('/register');
+        history('/register');
     };
 
     const handleShowFind = () => {
-        history.push('/find');
+        history('/find');
     };
 
     return (
