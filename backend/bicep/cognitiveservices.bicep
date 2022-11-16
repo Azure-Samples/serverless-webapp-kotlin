@@ -39,7 +39,7 @@ resource cognitiveService 'Microsoft.CognitiveServices/accounts@2022-10-01' = {
     apiProperties: {
       statisticsEnabled: true
     }
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
   }
 }
 

@@ -16,7 +16,7 @@ GLOBAL_CONSTANTS.set('PYTHON', {
 });
 
 export const Links_List = [
-    {label: 'Source code for the project', link: 'https://github.com/pankajagrawal16/serverless-webapp-mono-repo-ci-cd-java'},
+    {label: 'Source code for the project', link: 'https://github.com/azure-samples/serverless-webapp-kotlin'},
    // {label: 'Architecture diagram', link: '/serverless-webapp-mono-repo-ci-cd-java.png'},
   //  {label: 'Amazon Rekognition', link: 'https://aws.amazon.com/rekognition/'},
   //  {label: 'AWS Serverless Application Model', link: 'https://aws.amazon.com/serverless/sam/'},

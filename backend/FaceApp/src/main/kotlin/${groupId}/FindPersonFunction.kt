@@ -7,25 +7,17 @@ import com.azure.identity.DefaultAzureCredentialBuilder
 import com.azure.security.keyvault.secrets.SecretClientBuilder
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.microsoft.azure.cognitiveservices.vision.faceapi.FaceAPIManager
+import com.microsoft.azure.cognitiveservices.vision.faceapi.models.*
 import com.microsoft.azure.functions.*
 import com.microsoft.azure.functions.annotation.AuthorizationLevel
 import com.microsoft.azure.functions.annotation.FunctionName
 import com.microsoft.azure.functions.annotation.HttpTrigger
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
-import software.amazon.awssdk.core.SdkBytes
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.rekognition.RekognitionClient
-import software.amazon.awssdk.services.rekognition.model.FaceMatch
-import software.amazon.awssdk.services.rekognition.model.Image
-import software.amazon.awssdk.services.rekognition.model.SearchFacesByImageResponse
 import java.util.*
 
 
 class FindPersonFunction {
     private val mapper = jacksonObjectMapper()
-
-    private val COLLECTION_ID = "FaceAppCollection"
 
     private val keyVaultClient = SecretClientBuilder()
         .vaultUrl("https://${System.getenv("KEYVAULT_NAME")}.vault.azure.net/")
@@ -37,17 +29,9 @@ class FindPersonFunction {
         .endpoint(System.getenv("FaceAppDatabaseConnectionString__accountEndpoint"))
         .buildAsyncClient()
 
-    private val recognitionClient = RekognitionClient
-        .builder()
-        .region(Region.EU_WEST_1)
-        .credentialsProvider(
-            StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    keyVaultClient.getSecret("AWSAccessKey").value,
-                    keyVaultClient.getSecret("AwsSecretKey").value
-                )
-            )
-        ).build()
+    private val faceApi = FaceAPIManager.authenticate(
+        AzureRegions.WESTEUROPE, keyVaultClient.getSecret("CognitiveServiceKey").value
+    )
 
     init {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -76,14 +60,35 @@ class FindPersonFunction {
 
             val decodedImage: ByteArray = Base64.getDecoder().decode(request.body.get())
 
-            val faceSearch = faceSearch(decodedImage, context)
+            var trainingStatus = TrainingStatus()
+                .withStatus(TrainingStatusType.RUNNING)
 
-            if (faceSearch.isNotEmpty()) {
-                val faceMatch: FaceMatch = faceSearch[0]
+            while (trainingStatus.status() == TrainingStatusType.NONSTARTED
+                || trainingStatus.status() == TrainingStatusType.RUNNING
+            ) {
 
+                trainingStatus = faceApi.personGroups().getTrainingStatus(PERSON_GROUP_ID)
+            }
+
+            val detectedFaces = faceApi.faces().detectWithStream(
+                decodedImage, DetectWithStreamOptionalParameter()
+                    .withReturnFaceId(true)
+                    .withReturnFaceLandmarks(true)
+            )
+
+            val identify = faceApi.faces()
+                .identify(
+                    PERSON_GROUP_ID, detectedFaces.map { it.faceId() }, IdentifyOptionalParameter()
+                        .withMaxNumOfCandidatesReturned(1)
+                        .withConfidenceThreshold(0.9)
+                )
+
+            val personId = identify.flatMap { it.candidates() }.map { it.personId() }.first()
+
+            if (personId != null) {
                 val (_, name) = cosmoClient.getDatabase("faceapp")
                     .getContainer("faces")
-                    .readAllItems(PartitionKey(faceMatch.face().faceId()), FaceRegistration::class.java)
+                    .readAllItems(PartitionKey(personId), FaceRegistration::class.java)
                     .blockFirst()!!
 
                 responseBuilder
@@ -94,28 +99,6 @@ class FindPersonFunction {
                     .body(mapper.writeValueAsString(FindPersonResponse(message = "No match found in the record")))
                     .build()
             }
-        }
-    }
-
-    private fun faceSearch(decodedImage: ByteArray, context: ExecutionContext): List<FaceMatch> {
-        return try {
-            val searchFacesByImageResponse: SearchFacesByImageResponse =
-                recognitionClient.searchFacesByImage { builder ->
-                    builder.collectionId(COLLECTION_ID)
-                        .image(
-                            Image.builder()
-                                .bytes(SdkBytes.fromByteArray(decodedImage)).build()
-                        )
-                        .maxFaces(1)
-                        .faceMatchThreshold(90f)
-                }
-
-            context.logger.info("Service response for find face $searchFacesByImageResponse")
-            searchFacesByImageResponse
-                .faceMatches()
-        } catch (e: Exception) {
-            context.logger.severe("Failed getting find face result. Reason: $e")
-            emptyList()
         }
     }
 }
