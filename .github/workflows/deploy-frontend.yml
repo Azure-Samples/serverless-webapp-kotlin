@@ -18,7 +18,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        node-version: [14.x]
+        node-version: [19.x]
     name: Build with Node ${{ matrix.node-version }}
     env:
       OS: ${{ matrix.os }}
@@ -31,7 +31,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install
       working-directory: ./frontend
-      run: npm ci
+      run: npm ci --legacy-peer-deps
     - name: Build
       working-directory: ./frontend
       run: npm run build --if-present
