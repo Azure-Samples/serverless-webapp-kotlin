@@ -6,11 +6,6 @@ on:
       - main
     paths:
       - 'frontend/**'
-  push:
-    branches:
-      - main
-    paths:
-      - 'frontend/**'
 
 jobs:
   build:
