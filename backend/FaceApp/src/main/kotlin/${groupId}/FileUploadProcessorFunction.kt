@@ -10,7 +10,6 @@ import com.microsoft.azure.cognitiveservices.vision.faceapi.FaceAPIManager
 import com.microsoft.azure.cognitiveservices.vision.faceapi.models.*
 import com.microsoft.azure.functions.*
 import com.microsoft.azure.functions.annotation.*
-import software.amazon.awssdk.services.rekognition.model.*
 import java.util.*
 
 class FileUploadProcessorFunction {
