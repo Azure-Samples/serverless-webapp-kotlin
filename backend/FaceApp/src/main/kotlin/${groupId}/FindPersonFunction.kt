@@ -68,6 +68,13 @@ class FindPersonFunction {
             ) {
 
                 trainingStatus = faceApi.personGroups().getTrainingStatus(PERSON_GROUP_ID)
+
+                // Possibly person group is not created yet. Meaning register image has not been invoked even once.
+                if (trainingStatus == null) {
+                    return responseBuilder
+                        .body(mapper.writeValueAsString(FindPersonResponse(message = "No match found in the record")))
+                        .build()
+                }
             }
 
             val detectedFaces = faceApi.faces().detectWithStream(
@@ -80,20 +87,30 @@ class FindPersonFunction {
                 .identify(
                     PERSON_GROUP_ID, detectedFaces.map { it.faceId() }, IdentifyOptionalParameter()
                         .withMaxNumOfCandidatesReturned(1)
-                        .withConfidenceThreshold(0.9)
+                        .withConfidenceThreshold(0.7)
                 )
 
-            val personId = identify.flatMap { it.candidates() }.map { it.personId() }.first()
+            val personId =
+                identify.flatMap { it.candidates() }
+                    .map { it.personId() }
+                    .map { it.toString() }
+                    .firstOrNull()
 
             if (personId != null) {
-                val (_, name) = cosmoClient.getDatabase("faceapp")
+                val faceRegistration = cosmoClient.getDatabase("faceapp")
                     .getContainer("faces")
                     .readAllItems(PartitionKey(personId), FaceRegistration::class.java)
-                    .blockFirst()!!
+                    .blockFirst()
 
-                responseBuilder
-                    .body(mapper.writeValueAsString(FindPersonResponse(person_name = name)))
-                    .build()
+                if (faceRegistration != null) {
+                    responseBuilder
+                        .body(mapper.writeValueAsString(FindPersonResponse(person_name = faceRegistration.name)))
+                        .build()
+                } else {
+                    responseBuilder
+                        .body(mapper.writeValueAsString(FindPersonResponse(message = "No match found in the record")))
+                        .build()
+                }
             } else {
                 responseBuilder
                     .body(mapper.writeValueAsString(FindPersonResponse(message = "No match found in the record")))
