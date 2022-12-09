@@ -14,8 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.7.21</kotlin.version>
-<!--       Using snapshot version until released to maven central https://github.com/Azure/azure-functions-java-library/issues/190-->
-        <functions.version>3.0.0-SNAPSHOT</functions.version>
+        <functions.version>3.0.0</functions.version>
         <functions.plugin.version>1.21.0</functions.plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
