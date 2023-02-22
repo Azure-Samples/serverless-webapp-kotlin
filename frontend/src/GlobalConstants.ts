@@ -6,13 +6,13 @@ type Config = {
 export const GLOBAL_CONSTANTS = new Map<string, Config>();
 
 GLOBAL_CONSTANTS.set('JAVA', {
-        'FIND_IMAGE': `https://api.pankaagr.cloud/face/find-person?code=2eaa28d7ea62477291070423ee1244ce`,
-        'UPLOAD_URL': `https://api.pankaagr.cloud/face/upload-url?code=2eaa28d7ea62477291070423ee1244ce`,
+        'FIND_IMAGE': `https://api.pankaagr.cloud/face/find-person?code=81a59a2f816e4902a7a5a77dc772956a`,
+        'UPLOAD_URL': `https://api.pankaagr.cloud/face/upload-url?code=81a59a2f816e4902a7a5a77dc772956a`,
     });
 
 GLOBAL_CONSTANTS.set('PYTHON', {
-    'FIND_IMAGE': `https://api.pankaagr.cloud/face/find-person?code=2eaa28d7ea62477291070423ee1244ce`,
-    'UPLOAD_URL': `https://api.pankaagr.cloud/face/upload-url?code=2eaa28d7ea62477291070423ee1244ce`,
+    'FIND_IMAGE': `https://api.pankaagr.cloud/face/find-person?code=81a59a2f816e4902a7a5a77dc772956a`,
+    'UPLOAD_URL': `https://api.pankaagr.cloud/face/upload-url?code=81a59a2f816e4902a7a5a77dc772956a`,
 });
 
 export const Links_List = [
