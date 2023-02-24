@@ -1,14 +1,14 @@
 @description('Cosmos DB account name')
-param accountName string = 'faceapp-${uniqueString(resourceGroup().id)}'
+param accountName string
 
 @description('Location for the Cosmos DB account.')
 param location string = resourceGroup().location
 
 @description('The name for the SQL API database')
-param databaseName string = 'faceapp'
+param databaseName string
 
 @description('The name for the SQL API container')
-param containerName string = 'faces'
+param containerName string
 
 resource account 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
   name: accountName
@@ -72,3 +72,5 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
     }
   }
 }
+
+output accountName string = account.name

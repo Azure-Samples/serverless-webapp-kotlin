@@ -15,13 +15,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.7.21</kotlin.version>
         <functions.version>3.0.0</functions.version>
-        <functions.plugin.version>1.21.0</functions.plugin.version>
+        <functions.plugin.version>1.23.0</functions.plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <stagingDirectory>${project.build.directory}/azure-functions/${functionAppName}</stagingDirectory>
-        <functionAppName>faceRecogApp</functionAppName>
-        <functionAppRegion>westeurope</functionAppRegion>
-        <functionResourceGroup>staticwebsite</functionResourceGroup>
     </properties>
 
     <repositories>
@@ -166,15 +163,8 @@
             <plugin>
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>azure-functions-maven-plugin</artifactId>
-
                 <configuration>
-                    <resourceGroup>${functionResourceGroup}</resourceGroup>
-                    <appName>${functionAppName}</appName>
-                    <region>${functionAppRegion}</region>
                     <auth><type>azure_cli</type></auth>
-                    <subscriptionId>4a495935-942b-40cb-9a26-a468f977874b</subscriptionId>
-                    <appServicePlanName>faceRecogApp</appServicePlanName>
-                    <appInsightsInstance>faceRecogApp</appInsightsInstance>
                     <runtime>
                         <os>linux</os>
                         <javaVersion>8</javaVersion>

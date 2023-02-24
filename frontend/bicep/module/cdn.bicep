@@ -1,21 +1,17 @@
 param location string = resourceGroup().location
 param staticWebsiteUrl string = ''
-param dnsZoneName string = ''
-param cdnface string = 'app'
+
 
 var storageAccountHostName = replace(replace(staticWebsiteUrl, 'https://', ''), '/', '')
-var profileName  = 'frontendcdn'
+
+var profileName  = 'cdn-${uniqueString(resourceGroup().id)}'
 var endpointName = 'endpoint-${uniqueString(resourceGroup().id)}'
 
-resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
-  name: dnsZoneName
-}
-
 resource msCdn 'Microsoft.Cdn/profiles@2022-05-01-preview' = {
-  name: 'ms${profileName}'
+  name: 'ms-${profileName}'
   location: location
   tags: {
-    displayName: 'ms${profileName}'
+    displayName: 'ms-${profileName}'
   }
   sku: {
     name: 'Standard_Microsoft'
@@ -24,10 +20,10 @@ resource msCdn 'Microsoft.Cdn/profiles@2022-05-01-preview' = {
 
 resource msEndpoint 'Microsoft.Cdn/profiles/endpoints@2022-05-01-preview' = {
   parent: msCdn
-  name: 'ms${endpointName}'
+  name: 'ms-${endpointName}'
   location: location
   tags: {
-    displayName: 'ms${endpointName}'
+    displayName: 'ms-${endpointName}'
   }
   properties: {
     originHostHeader: storageAccountHostName
@@ -44,7 +40,7 @@ resource msEndpoint 'Microsoft.Cdn/profiles/endpoints@2022-05-01-preview' = {
     isCompressionEnabled: true
     origins: [
       {
-        name: 'origin1'
+        name: replace(storageAccountHostName,'.','-')
         properties: {
           hostName: storageAccountHostName
         }
@@ -112,27 +108,7 @@ resource msEndpoint 'Microsoft.Cdn/profiles/endpoints@2022-05-01-preview' = {
   }
 }
 
-resource msfacerecog 'Microsoft.Network/dnsZones/CNAME@2018-05-01' = {
-  parent: dnsZone
-  name: cdnface
-  properties: {
-    targetResource: {
-      id: msEndpoint.id
-    }
-    TTL: 15
-  }
-}
-
-resource msSymbolicName 'Microsoft.Cdn/profiles/endpoints/customDomains@2022-05-01-preview' = {
-  name: cdnface
-  parent: msEndpoint
-  properties: {
-    hostName: '${cdnface}.pankaagr.cloud'
-  }
-  dependsOn: [
-    msfacerecog
-  ]
-}
-
 output hostName string = msEndpoint.properties.hostName
+output msEndpointName string = '${msCdn.name}/${msEndpoint.name}'
+output msCdnName string = msCdn.name
 output originHostHeader string = msEndpoint.properties.originHostHeader

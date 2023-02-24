@@ -66,7 +66,7 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-01-01-pre
   name: 'policy'
   properties: {
     format: 'rawxml'
-    value: replace(replace(loadTextContent('cos-policy.xml'),'__ORIGIN__',originUrl), '__DEV_ORIGIN__', devOriginUrl)
+    value: replace(replace(loadTextContent('../resources/cos-policy.xml'),'__ORIGIN__',originUrl), '__DEV_ORIGIN__', devOriginUrl)
   }
 }
 
@@ -85,7 +85,7 @@ resource opGetUploadUrlPolicy 'Microsoft.ApiManagement/service/apis/operations/p
   name: 'policy'
   properties: {
     format: 'rawxml'
-    value: replace(loadTextContent('api-policy.xml'),'__BACKEND-ID__', backendApi.name)
+    value: replace(loadTextContent('../resources/api-policy.xml'),'__BACKEND-ID__', backendApi.name)
   }
 }
 
@@ -104,7 +104,7 @@ resource opPostFindFacePolicy 'Microsoft.ApiManagement/service/apis/operations/p
   name: 'policy'
   properties: {
     format: 'rawxml'
-    value: replace(loadTextContent('api-policy.xml'),'__BACKEND-ID__', backendApi.name)
+    value: replace(loadTextContent('../resources/api-policy.xml'),'__BACKEND-ID__', backendApi.name)
   }
 }
 
@@ -119,33 +119,5 @@ resource subscriptionKey 'Microsoft.ApiManagement/service/subscriptions@2021-12-
   }
 }
 
-// Managed preview certifcate is used to create custom domain via click
-resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
-  name: 'pankaagr.cloud'
-}
-
-resource apiCname 'Microsoft.Network/dnsZones/CNAME@2018-05-01' = {
-  name: 'api'
-  parent: dnsZone
-  properties: {
-    TTL: 15
-    CNAMERecord: {
-      cname: '${apim.name}.azure-api.net'
-    }
-  }
-}
-
-resource apiTxt 'Microsoft.Network/dnsZones/TXT@2018-05-01' = {
-  name: 'apimuid.api'
-  parent: dnsZone
-  properties: {
-    TTL: 15
-    TXTRecords: [
-      {
-        value: [
-          'oYfj1xQWlxO7zmQF4EM9c/9duVc1srv4v/kcxjEMZX8='
-        ]
-      }
-    ]
-  }
-}
+output uploadURl string = '${apim.properties.gatewayUrl}/${api.name}${opGetUploadUrl.properties.urlTemplate}'
+output findPersonUrl string = '${apim.properties.gatewayUrl}/${api.name}${opPostFindFace.properties.urlTemplate}'

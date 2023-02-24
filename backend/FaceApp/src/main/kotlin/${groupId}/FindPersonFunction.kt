@@ -97,8 +97,8 @@ class FindPersonFunction {
                     .firstOrNull()
 
             if (personId != null) {
-                val faceRegistration = cosmoClient.getDatabase("faceapp")
-                    .getContainer("faces")
+                val faceRegistration = cosmoClient.getDatabase(System.getenv("FACE_APP_DATABASE_NAME"))
+                    .getContainer(System.getenv("FACE_APP_CONTAINER_NAME"))
                     .readAllItems(PartitionKey(personId), FaceRegistration::class.java)
                     .blockFirst()
 
