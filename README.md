@@ -28,18 +28,18 @@ Given [pre requisite](#pre-requisite) are already configured, lets get started t
     RESOURCE_GROUP=<<new resource group name>>
 
     # Required if custom domain needs to be configured for the app, else set as empty
-    DNS_NAME=<<custom domain that you own>>
+    DNS_ZONE=<<custom domain that you own>>
     ```
 
 2. Login into azure
 
     ```bash
     # Complete login on the browser window which opens up after below command
-    az login --tenant ${AZURE_TENANT}
-    az account set --subscription ${SUBSCRIPTION_ID}
+    az login --tenant $AZURE_TENANT
+    az account set --subscription $SUBSCRIPTION_ID
 
     # Set default resource group and region. If you don't want to set default, make sure to pass this in relevant commands later.
-    az config set defaults.location={AZURE_REGION} defaults.group=${RESOURCE_GROUP}
+    az config set defaults.location=$AZURE_REGION defaults.group=$RESOURCE_GROUP
     ```
 
 # Deploy core infrastructure resources
@@ -47,13 +47,13 @@ Given [pre requisite](#pre-requisite) are already configured, lets get started t
 In core infra setup, resources which are common to both frontend and backend are deployed. Primarily this is used to create a resource group where both frontend and backend resources will be created. If you plan to configure custom domain name for the app, Azure DNS zone can also be created.
 
 ```bash
-az deployment sub create -f core/bicep/main.bicep -n core-infra-$RANDOM -p resourceGroup=${RESOURCE_GROUP} location=${AZURE_REGION} dnsZoneName=${DNS_ZONE}
+az deployment sub create -f core/bicep/main.bicep -n core-infra -p resourceGroup=$RESOURCE_GROUP location=$AZURE_REGION dnsZoneName=$DNS_ZONE
 ```
 
 If DNS Zone is specified for custom domain, update your DNS registrar with created DNS zone name server info. You can get name server info by running below command.
 
 ```bash
-az network dns zone show --name ${DNS_ZONE} -o jsonc
+az network dns zone show --name $DNS_ZONE -o jsonc
 ```
 
 # Deploy frontend infrastructure and application
@@ -66,7 +66,7 @@ az network dns zone show --name ${DNS_ZONE} -o jsonc
 2. Deploy frontend infrastructure which includes storage account for static website hosting and Azure CDN. Depending on if you specify DNS zone as well, it will attempt to configure custom domain with the CDN as wel with CDN managed certificate. By default, IAC will configure custom domain with `app.$DNS_ZONE`
 
     ```bash
-    az deployment group create -f frontend/bicep/main.bicep  --name app-frontend -p dnsZoneName=${DNS_ZONE}
+    az deployment group create -f frontend/bicep/main.bicep --name app-frontend -p dnsZoneName=$DNS_ZONE
 
     FRONTEND_STORAGE=$(az deployment group show --name app-frontend --output tsv --query 'properties.outputs.storageAccountNameForFrontEndArtifacts.value')
 
@@ -74,9 +74,12 @@ az network dns zone show --name ${DNS_ZONE} -o jsonc
 
     echo $FRONTEND_STORAGE
     echo $FRONTEND_URL
-
-    # TODO test if custom domain https works now
     ````
+
+    Next, Go to the azure portal and navigate to Azure CDN endpoint created. Under custom domain, **enable custom https** and use cdn managed.
+
+    ![CDN-cert](CDN-Cert.jpg)
+
 3. Deploy frontend application
 
     ```bash

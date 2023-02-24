@@ -32,7 +32,6 @@ module cdnCustomDomin 'module/cdnCustomDomain.bicep' = if(customDomainSetupNeede
     appARecord: 'app'
     cdnEndpointName: cdn.outputs.msEndpointName
     dnsZoneName: dnsZoneName
-    msCdnName: cdn.outputs.msCdnName
   }
 }
 
