@@ -12,7 +12,11 @@ TODO
 
 # Pre requisite
 
-TODO
+Either install tools listed below or use Github codespaces. 
+
+- [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Java 11](https://learn.microsoft.com/en-us/java/openjdk/install)
+
 
 # Initialization
 
