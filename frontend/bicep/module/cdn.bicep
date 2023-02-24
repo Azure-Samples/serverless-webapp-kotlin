@@ -110,4 +110,5 @@ resource msEndpoint 'Microsoft.Cdn/profiles/endpoints@2022-05-01-preview' = {
 
 output hostName string = msEndpoint.properties.hostName
 output msEndpointName string = '${msCdn.name}/${msEndpoint.name}'
+output msCdnName string = msCdn.name
 output originHostHeader string = msEndpoint.properties.originHostHeader

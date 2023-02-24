@@ -1,36 +1,25 @@
 @description('Suffix for naming resources')
 param appNameSuffix string = 'app${uniqueString(resourceGroup().id)}'
-
 @description('Specifies the location for resources.')
 param location string = resourceGroup().location
-
-@description('Do we need to invoke deploy script?')
-@allowed( [
-  'Yes'
-  'No'
-]
-)
-param siteDeployRequired string
-
 @description('Specifies the name of domain name to be delegated to Azure DNS')
 param dnsZoneName string
-var customDomainSetupNeeded = !empty(dnsZoneName)
 
 targetScope =  'resourceGroup'
 
+var customDomainSetupNeeded = !empty(dnsZoneName)
 var storageAccountName = 'frontend${appNameSuffix}'
 
 module siteSetup 'module/site.bicep' = {
   name: 'siteSetup-${appNameSuffix}'
   params: {
     location: location
-    siteDeployRequired: siteDeployRequired
     storageAccountName: storageAccountName
   }
 }
 
 module cdn 'module/cdn.bicep' = {
-  name:'frontendCdn${appNameSuffix}'
+  name:'frontendCdn-${appNameSuffix}'
   params: {
     location: location
     staticWebsiteUrl: siteSetup.outputs.staticWebsiteUrl
@@ -38,12 +27,15 @@ module cdn 'module/cdn.bicep' = {
 }
 
 module cdnCustomDomin 'module/cdnCustomDomain.bicep' = if(customDomainSetupNeeded) {
-  name: 'cdnCustomDomin'
+  name: 'cdnCustomDomain-${appNameSuffix}'
   params: {
     appARecord: 'app'
     cdnEndpointName: cdn.outputs.msEndpointName
     dnsZoneName: dnsZoneName
+    msCdnName: cdn.outputs.msCdnName
   }
 }
 
 output storageAccountNameForFrontEndArtifacts string = siteSetup.outputs.storageAccountName
+output cdnEndpointHostName string = cdn.outputs.hostName
+

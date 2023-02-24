@@ -1,17 +1,14 @@
 @description('Specifies the location for resources.')
 param location string = resourceGroup().location
-
+@description('Frontend application origin host. Its needed to set proper CORS policies')
 param originHostForFrontend string
-
 @description('Do you want to create new APIM? Switch off after initial deploy of custom domain')
 param createApim bool
 
 var frontEndSiteOrigin = 'https://${originHostForFrontend}'
-
 var allowedOrigins = [
 'http://localhost:3000', 'https://localhost:3000', frontEndSiteOrigin
 ]
-
 var appName = 'webapp-${uniqueString(resourceGroup().id)}'
 
 module keyVault 'module/keyVault.bicep' = {
@@ -95,6 +92,9 @@ module apimAPI 'module/apimAPI.bicep'= {
 }
 
 output uploadURl string = apimAPI.outputs.uploadURl
-output findPersonUrl string = apimAPI.outputs.uploadURl
+output findPersonUrl string = apimAPI.outputs.findPersonUrl
 output imageStorageAccountName string = functionBackend.outputs.imageStorageAccountName
 output functionAppName string = functionBackend.outputs.functionAppName
+output apiManagementName string = apiManagementName
+output kvName string = keyVault.outputs.vaultName
+output dbAccountName string = appCosmoDb.outputs.accountName

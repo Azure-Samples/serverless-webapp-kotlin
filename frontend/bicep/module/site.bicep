@@ -1,9 +1,7 @@
 param location string = resourceGroup().location
 param storageAccountName string
-param siteDeployRequired string
 
 var jsonServiceTag = loadJsonContent('../resources/ServiceTags_Public_20221031.json')
-
 var ipRulesArray = [for ip in jsonServiceTag.addressPrefixes : {
     value: ip
 }]
@@ -53,7 +51,7 @@ resource roleAssignments 'Microsoft.Authorization/roleAssignments@2020-10-01-pre
   }
 }
 
-resource Microsoft_Resources_deploymentScripts_deploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(siteDeployRequired == 'Yes') {
+resource Microsoft_Resources_deploymentScripts_deploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'deploymentScript'
   location: location
   kind: 'AzurePowerShell'

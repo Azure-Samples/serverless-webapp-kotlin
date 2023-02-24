@@ -1,16 +1,14 @@
-param location string = resourceGroup().location
 
 @description('Name of storage account for which system topic and subscription will be created')
 param storageAccountName string
-
 @description('Name of function app where function which will be subscribed is hosted. Skip if this run is just for dev')
 param functionApp string
-
 @description('Name of the function which will be subscribed to blob created event')
 param functionName string = 'file-upload-processor'
-
 @description('If you have a dev setup with ngrok, pass the proxy domain, else leave it empty')
 param devSubscriptionUrl string
+
+param location string = resourceGroup().location
 
 var cloudEnvironmentSubscription = !empty(functionApp)
 var devEnvironmentSubscription = !empty(devSubscriptionUrl)
