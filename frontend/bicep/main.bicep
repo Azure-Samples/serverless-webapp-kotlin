@@ -36,5 +36,5 @@ module cdnCustomDomin 'module/cdnCustomDomain.bicep' = if(customDomainSetupNeede
 }
 
 output storageAccountNameForFrontEndArtifacts string = siteSetup.outputs.storageAccountName
-output cdnEndpointHostName string = cdn.outputs.hostName
+output cdnEndpointHostName string = customDomainSetupNeeded ? 'app.${dnsZoneName}' : cdn.outputs.hostName
 
