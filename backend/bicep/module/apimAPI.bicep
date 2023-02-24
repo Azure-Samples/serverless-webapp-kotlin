@@ -119,5 +119,6 @@ resource subscriptionKey 'Microsoft.ApiManagement/service/subscriptions@2021-12-
   }
 }
 
-output uploadURl string = '${apim.properties.gatewayUrl}/${api.name}${opGetUploadUrl.properties.urlTemplate}'
-output findPersonUrl string = '${apim.properties.gatewayUrl}/${api.name}${opPostFindFace.properties.urlTemplate}'
+output gatewayUrl string = apim.properties.gatewayUrl
+output uploadURl string = '${api.name}${opGetUploadUrl.properties.urlTemplate}'
+output findPersonUrl string = '${api.name}${opPostFindFace.properties.urlTemplate}'

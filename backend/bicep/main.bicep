@@ -4,6 +4,8 @@ param location string = resourceGroup().location
 param originHostForFrontend string
 @description('Do you want to create new APIM? Switch off after initial deploy of custom domain')
 param createApim bool
+@description('DNS zone name in case of custom domain')
+param dnsName string
 
 var frontEndSiteOrigin = 'https://${originHostForFrontend}'
 var allowedOrigins = [
@@ -91,8 +93,10 @@ module apimAPI 'module/apimAPI.bicep'= {
   ]
 }
 
-output uploadURl string = apimAPI.outputs.uploadURl
-output findPersonUrl string = apimAPI.outputs.findPersonUrl
+var customDomain = !empty(dnsName)
+
+output uploadURl string = customDomain? 'https://api.${dnsName}/${apimAPI.outputs.uploadURl}' : '${apimAPI.outputs.gatewayUrl}/${apimAPI.outputs.uploadURl}'
+output findPersonUrl string = customDomain? 'https://api.${dnsName}/${apimAPI.outputs.findPersonUrl}' : '${apimAPI.outputs.gatewayUrl}/${apimAPI.outputs.findPersonUrl}'
 output imageStorageAccountName string = functionBackend.outputs.imageStorageAccountName
 output functionAppName string = functionBackend.outputs.functionAppName
 output apiManagementName string = apiManagementName

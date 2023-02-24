@@ -104,7 +104,7 @@ Now that the frontend application should be up and running, let get started to d
 1. Deploy backend infrastructure.
 
     ```bash
-    az deployment group create -f backend/bicep/main.bicep --name app-backend -p originHostForFrontend=$FRONTEND_URL createApim=true
+    az deployment group create -f backend/bicep/main.bicep --name app-backend -p originHostForFrontend=$FRONTEND_URL createApim=true dnsName=$DNS_ZONE
     ```
 2. !!OPTIONAL!! Configure custom domain with [APIM Managed Certificate](https://azure.microsoft.com/en-us/updates/public-preview-managed-certificate-support-for-azure-api-management/), which is still in public preview. This step is required only if you are using custom domain as well to configure the app. By default, IAC will configure custom domain with `api.$DNS_ZONE`. Because free managed cert for APIM is still in preview, we need to do perform some steps manually in console.
 
@@ -146,7 +146,6 @@ Now that the frontend application should be up and running, let get started to d
 5. Fetch API related details to update it in the frontend application.
 
     ```bash
-
     FIND_IMAGE_URL=$(az deployment group show --name app-backend --output tsv --query 'properties.outputs.findPersonUrl.value')
 
     UPLOAD_URL=$(az deployment group show --name app-backend --output tsv --query 'properties.outputs.uploadURl.value')
