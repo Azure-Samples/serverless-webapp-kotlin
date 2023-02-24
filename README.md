@@ -180,9 +180,25 @@ Now that the frontend application should be up and running, let get started to d
 
 CONGRATULATIONS!! The application should be up and running with both frontend and backend functional.
 
-# CI CD
+# Deployment using CI and CD
 
+Application uses GitHub actions for deploying both infrastructure and application resources. All workflows can be found in [.github](.github/workflows/) folder.
+
+Git actions uses [Azure login action with OpenID Connect](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-openid-connect) to authenticate with azure. 
+
+### Setup app for OpenId Connect Auth
+
+```bash
 TODO
+```
+
+Below are different workflows:
+
+1. Deploy frontend application
+2. Deploy backend application i.e. azure function app
+3. Core infrastructure
+4. Frontend infrastructure
+5. Backend infrastructure
 
 ## Run applications locally
 
