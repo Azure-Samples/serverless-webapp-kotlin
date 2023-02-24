@@ -2,15 +2,6 @@
 # https://github.com/Azure/azure-functions-docker/blob/dev/host/4/bullseye/amd64/java/java11/java11-core-tools.Dockerfile
 FROM mcr.microsoft.com/azure-functions/java:4-java11-core-tools
 
-RUN apt-get -qq update && \
-    apt-get install -y software-properties-common && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0x219BD9C9 && \
-    apt-add-repository "deb http://repos.azulsystems.com/debian stable main" && \
-    apt-get -qq update && \
-    apt-get -qq -y dist-upgrade && \
-    apt-get -qq -y --no-install-recommends install zulu-8=8.46.0.19 && \
-    rm -rf /var/lib/apt/lists/*
-
 # Uncomment following lines If you want to enable Development Container Script
 # For more details https://github.com/microsoft/vscode-dev-containers/tree/main/script-library
 

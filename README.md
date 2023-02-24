@@ -225,7 +225,7 @@ If you want to test azure functions locally, it's possible to do so. Functions a
 
     echo $IMAGE_STORAGE
 
-    az deployment group create -f backend/bicep/eventSubscription.bicep  --name app-backend-event-subscription -p storageAccountName=$IMAGE_STORAGE functionApp='' devSubscriptionUrl=<<replace with ngrok generated https url>>
+    az deployment group create -f backend/bicep/eventSubscription.bicep --name app-backend-event-subscription -p storageAccountName=$IMAGE_STORAGE functionApp='' devSubscriptionUrl=<<replace with ngrok generated https url>>
     ```
 
 4. If needed to test end to end using frontend application as well, get the frontend app up and running as well in a separate terminal window. Open [GlobalConstants.ts](frontend/src/GlobalConstants.ts) and update properties `UPLOAD_URL` and `FIND_IMAGE` to ``localhost` urls
