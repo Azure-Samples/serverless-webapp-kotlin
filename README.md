@@ -188,9 +188,39 @@ Git actions uses [Azure login action with OpenID Connect](https://learn.microsof
 
 ### Setup app for OpenId Connect Auth
 
-```bash
-TODO
-```
+1. Register and configure application for GitHub actions deployment.
+
+    ```bash
+    appId=$(az ad app create --display-name gitlab-oidc --query appId -otsv)
+
+    az ad sp create --id $appId --query appId -otsv
+
+    cat <<EOF > body.json
+    {
+    "name": "serverless-webapp-kotlin-federated-identity",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:Azure-samples/serverless-webapp-kotlin:ref:refs/heads/main",
+    "description": "GitHub account federated identity",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+    }
+    EOF
+
+    az rest --method POST --uri "https://graph.microsoft.com/beta/applications/$objectId/federatedIdentityCredentials" --body @body.json
+
+    az role assignment create --assignee $appId --role contributor --scope /subscriptions/$SUBSCRIPTION_ID
+    ```
+2. Configure secrets details in GitHub repo as described here [Create GitHub secrets](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux#create-github-secrets). Use below values mapped to relevant secrets in GitHub
+
+    ```bash
+    # AZURE_SUBSCRIPTION_ID
+    echo $SUBSCRIPTION_ID 
+    # AZURE_TENANT_ID   
+    echo $AZURE_TENANT    
+    # AZURE_CLIENT_ID      
+    echo $appId             
+    ```
 
 Below are different workflows:
 
