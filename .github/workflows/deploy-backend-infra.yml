@@ -1,0 +1,80 @@
+name: Deploy backend infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/bicep/**
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  DNS_ZONE: ${{ vars.DNS_ZONE }}
+  AZURE_REGION: ${{ vars.AZURE_REGION }}
+  BICEP_FILE_PATH: backend/bicep
+  BICEP_FILE_NAME: main
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  backend-infra-deployment:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    name: Build and Deploy backend infrastructure bicep templates
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Set default region and resource group for cli
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
+    - name: Get frontend URL to configure CORS setting in backend
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          CUSTOM_HOSTNAME=$(az cdn endpoint list --profile-name $(az cdn profile list -o tsv --query [0].name) -o tsv --query [0].customDomains[0].hostName)
+          HOST_NAME=$(az cdn endpoint list --profile-name $(az cdn profile list -o tsv --query [0].name) -o tsv --query [0].hostName)
+
+          [ -z "$CUSTOM_HOSTNAME" ] &&  FRONTEND_URL=$HOST_NAME ||  FRONTEND_URL=$CUSTOM_HOSTNAME
+
+          echo FRONTEND_URL=$FRONTEND_URL >> $GITHUB_ENV
+    - name: Check if APIM should be created/updated
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          if [ ! -z "$(az apim list -o tsv --query "[*].name")" ]
+          then
+          APIM_MANAGED_CERT_LENGHT=$(az apim list -o tsv --query "length([*].hostnameConfigurations|[0][?certificateSource == 'Managed'])")
+          [  "$APIM_MANAGED_CERT_LENGHT" == 0 ] && CREATE_APIM=true || CREATE_APIM=false
+          else 
+          CREATE_APIM=true
+          fi
+
+          echo CREATE_APIM=$CREATE_APIM >> $GITHUB_ENV
+    - name: Validate backend infra bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az deployment group validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p dnsName=${{ env.DNS_ZONE }} originHostForFrontend=${{ env.FRONTEND_URL }} createApim=${{ env.CREATE_APIM }}
+          az bicep upgrade
+          az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+    - name: Deploy backend infrastructure
+      id: backendInfraDeployment
+      uses: azure/arm-deploy@v1
+      with:
+        deploymentName: 'via-github-backend-infra-${{ github.run_number }}'
+        resourceGroupName: ${{ env.RESOURCE_GROUP }}
+        region: ${{ env.AZURE_REGION }}
+        template: ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.json  # Set this to the location of your template file
+        parameters: dnsName=${{ env.DNS_ZONE }} originHostForFrontend=${{ env.FRONTEND_URL }} createApim=${{ env.CREATE_APIM }}
+

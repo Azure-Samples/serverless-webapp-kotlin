@@ -1,0 +1,151 @@
+name: Build and Deploy Backend to Azure Functions
+
+on:
+    push:
+      branches: [ main ]
+      paths:
+        - backend/FaceApp/**
+    workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  AZURE_REGION: ${{ vars.AZURE_REGION }}
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  get-function-app-name:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    name: Get function app name
+    outputs:
+      FN_APP_NAME: ${{ steps.getFunctionAppName.outputs.FN_APP_NAME}}
+    steps:
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Set default region and resource group for cli
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
+    - name: Get function app name
+      uses: azure/CLI@v1
+      id: getFunctionAppName
+      with:
+        inlineScript: |
+          FN_APP_NAME=$(az functionapp list -o tsv --query [*].name)
+          echo "FN_APP_NAME=$FN_APP_NAME" >> $GITHUB_OUTPUT 
+  build:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    needs: get-function-app-name
+    strategy:
+      max-parallel: 4
+      matrix:
+        java-version: [11.0.x]
+    name: Build with Java ${{ matrix.java-version }}
+    env:
+      OS: ${{ matrix.os }}
+      JAVA_VERSION: ${{ matrix.java-version }}
+      FN_APP_NAME: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'zulu'
+        java-version: ${{ matrix.java-version }}
+    - name: Build and Test
+      working-directory: ./backend/FaceApp
+      run: mvn clean install -DappName=$FN_APP_NAME
+
+    - name: Artifact folder for deploy
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: .
+
+  deploy-azure-functions:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    needs: [get-function-app-name, build]
+    runs-on: ubuntu-latest
+    name: Deploy azure functions
+    env:
+      FN_APP_NAME: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
+    steps:
+    - name: Download artifact for deploy
+      uses: actions/download-artifact@v3
+      with:
+        name: app
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Deploy functions to azure function app
+      working-directory: ./backend/FaceApp
+      run: | 
+        echo Deploying to function app $FN_APP_NAME in resource group $RESOURCE_GROUP
+        mvn azure-functions:deploy -DresourceGroup=$RESOURCE_GROUP -DappName=$FN_APP_NAME
+    - name: logout
+      run: |
+            az logout
+      if: always()
+
+  enable-subscription-on-blob-container:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    needs: [get-function-app-name, deploy-azure-functions]
+    runs-on: ubuntu-latest
+    name: Enable event grid subscription on image storage container with azure function
+    env:
+      BICEP_FILE_PATH: backend/bicep
+      BICEP_FILE_NAME: eventSubscription
+      FN_APP_NAME: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
+    steps:
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Set default region and resource group for cli
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
+    - name: Get image storage name
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          IMAGE_STORAGE=$(az storage account list -o tsv --query "[?starts_with(name, 'istoreapp')]|[0].name")
+          echo "IMAGE_STORAGE=$IMAGE_STORAGE" >> $GITHUB_ENV
+    - uses: actions/checkout@v3
+    - name: Validate event subscription bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az deployment group validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p storageAccountName=${{ env.IMAGE_STORAGE }} functionApp=${{ env.FN_APP_NAME }} devSubscriptionUrl=
+          az bicep upgrade
+          az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+    - name: Deploy event subscription with storage ${{ env.IMAGE_STORAGE }} and function app ${{ env.FN_APP_NAME }}
+      id: backendInfraDeployment
+      uses: azure/arm-deploy@v1
+      with:
+        deploymentName: 'via-github-event-subscription-${{ github.run_number }}'
+        resourceGroupName: ${{ env.RESOURCE_GROUP }}
+        region: ${{ env.AZURE_REGION }}
+        template: ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.json 
+        parameters: storageAccountName=${{ env.IMAGE_STORAGE }} functionApp=${{ env.FN_APP_NAME }} devSubscriptionUrl=
+    - name: logout
+      run: |
+            az logout
+      if: always()
+
+

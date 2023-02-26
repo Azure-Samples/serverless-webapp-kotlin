@@ -1,0 +1,27 @@
+<policies>
+    <inbound>
+        <cors>
+            <allowed-origins>
+                <origin>__ORIGIN__</origin>
+                <origin>__DEV_ORIGIN__</origin>
+            </allowed-origins>
+            <allowed-methods>
+                <method>*</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>*</header>
+            </allowed-headers>
+            <expose-headers>
+                <header>*</header>
+            </expose-headers>
+        </cors>
+        <!-- Disabled because of consumption SKU. Enable if required in other SKU -->
+        <!-- <rate-limit-by-key calls="10" renewal-period="60" counter-key="@(context.Subscription?.Key ?? "anonymous")" /> -->
+        <!-- <quota-by-key calls="1000" renewal-period="86400" counter-key="@(context.Request.IpAddress)" /> -->
+    </inbound>
+    <backend>
+        <forward-request />
+    </backend>
+    <outbound />
+    <on-error />
+</policies>
