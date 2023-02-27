@@ -4,7 +4,6 @@ on:
       upload-artifact-key:
         required: false
         type: string
-        default: ''
 
 jobs:
   build:
@@ -31,7 +30,7 @@ jobs:
       - name: Test
         working-directory: ./frontend
         run: npm test 
-        if: ${{ inputs.upload-artifact-key != '' }}
+        if: ${{ inputs.upload-artifact-key != "" }}
       - name: Artifact build folder for deploy
         uses: actions/upload-artifact@v3
         with:
