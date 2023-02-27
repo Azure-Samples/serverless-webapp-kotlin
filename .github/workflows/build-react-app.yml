@@ -30,8 +30,8 @@ jobs:
       - name: Test
         working-directory: ./frontend
         run: npm test 
-        if: ${{ inputs.upload-artifact-key != '' }}
       - name: Artifact build folder for deploy
+        if: ${{ inputs.upload-artifact-key != '' }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.upload-artifact-key }}
