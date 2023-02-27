@@ -19,7 +19,7 @@ Demos:
 
 # Architecture diagram for the application
 
-TODO
+![Architecture](images/Architecture.png)
 
 # Pre-requisite
 
@@ -94,7 +94,7 @@ Given [pre requisite](#pre-requisite) are already configured, lets get started t
 
     Next, Go to the azure portal and navigate to Azure CDN endpoint created. Under custom domain, **enable custom https** and use cdn managed.
 
-    ![CDN-cert](CDN-Cert.jpg)
+    ![CDN-cert](images/CDN-Cert.jpg)
 
 3. Deploy frontend application
 
@@ -126,7 +126,7 @@ Now that the frontend application should be up and running, let get started to d
 
     Firstly, Navigate to azure portal --> resource group --> configured resource group --> APIM --> Select deployed APIM instance --> go to custom domain. Refer screenshot below. Copy the TXT record has value. Hostname value should be `api.$DNS_ZONE`. So if you domain name is `contosohotels.com` then put `api.contosohotels.com`. Click Add but **Do not click** save yet. We first need to configure dns records in the dns zone.
 
-    ![APIM-Cert](APIM-Cert.jpg)Next, once you have TXT record hash copied, run below command:
+    ![APIM-Cert](images/APIM-Cert.jpg)Next, once you have TXT record hash copied, run below command:
 
     ```bash
     APIM=$(az deployment group show --name app-backend --output tsv --query 'properties.outputs.apiManagementName.value')
