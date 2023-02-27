@@ -3,7 +3,6 @@ param staticWebsiteUrl string = ''
 
 
 var storageAccountHostName = replace(replace(staticWebsiteUrl, 'https://', ''), '/', '')
-
 var profileName  = 'cdn-${uniqueString(resourceGroup().id)}'
 var endpointName = 'endpoint-${uniqueString(resourceGroup().id)}'
 

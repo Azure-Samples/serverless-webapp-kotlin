@@ -1,0 +1,21 @@
+on:
+  workflow_call:
+    inputs:
+      bicep-files:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        file: ${{ fromJson(inputs.bicep-files) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Validate ${{ inputs.bicep-file }}
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az bicep upgrade
+            az bicep build --file ${{ matrix.file }}
