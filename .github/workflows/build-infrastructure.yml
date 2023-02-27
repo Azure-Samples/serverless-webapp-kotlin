@@ -1,0 +1,59 @@
+name: Build bicep files
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - core/bicep/**
+      - frontend/bicep/**
+      - backend/bicep/**
+
+jobs:
+  detect-changes:
+    name: Detect folders which has changed to trigger build conditionally
+    runs-on: ubuntu-latest 
+    permissions:
+       pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      core: ${{ steps.filter.outputs.core }}
+    steps:
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          backend:
+            - 'backend/bicep/**'
+          frontend:
+            - 'frontend/bicep/**'
+          core:
+            - 'core/bicep/**'
+
+  backend:
+    needs: detect-changes
+    name: backend
+    if: ${{ needs.detect-changes.outputs.backend == 'true' }}
+    uses: ./.github/workflows/build-bicep.yml
+    with:
+      bicep-files: "['backend/bicep/main.bicep', 'backend/bicep/eventSubscription.bicep', 'backend/bicep/apimManagedCert.bicep']"
+ 
+  frontend:
+    needs: detect-changes
+    name: frontend
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' }}
+    uses: ./.github/workflows/build-bicep.yml
+    with:
+      bicep-files: "['frontend/bicep/main.bicep}']"
+
+  core:
+    needs: detect-changes
+    name: core
+    if: ${{ needs.detect-changes.outputs.core == 'true' }}
+    uses: ./.github/workflows/build-bicep.yml
+    with:
+      bicep-files: "['core/bicep/main.bicep']"
+
+
+  

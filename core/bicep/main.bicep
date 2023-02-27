@@ -1,9 +1,7 @@
 @description('Specifies the location for resources.')
 param location string
-
 @description('Specifies the name of resource group where all the application resources will be deployed')
 param resourceGroup string
-
 @description('Specifies the name of domain name to be delegated to Azure DNS')
 param dnsZoneName string
 

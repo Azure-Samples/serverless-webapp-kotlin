@@ -13,7 +13,6 @@ param resourceTags object
 ])
 @description('The pricing tier of this API Management service')
 param sku string = 'Consumption'
-
 @description('The instance size of this API Management service.')
 @minValue(0)
 param skuCount int = 0
