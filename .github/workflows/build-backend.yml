@@ -6,8 +6,34 @@ on:
       - main
     paths:
       - "backend/**"
+      - ".github/workflows/build-backend.yml"
+      - ".github/workflows/build-maven-project.yml"
       - "!backend/bicep/**"
 
 jobs:
   build-java-app:
     uses: ./.github/workflows/build-maven-project.yml
+
+  dependabot-approve-merge:
+    needs: build-java-app
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest   
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Approve a PR
+        run: |
+          gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
+          if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" != "APPROVED" ];
+          then gh pr review --approve "$PR_URL"
+          else echo "PR already approved, skipping additional approvals to minimize emails/notification noise.";
+          fi
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: auto-merge for Dependabot PRs
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      

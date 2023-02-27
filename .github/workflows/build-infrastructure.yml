@@ -8,6 +8,8 @@ on:
       - core/bicep/**
       - frontend/bicep/**
       - backend/bicep/**
+      - .github/workflows/build-infrastructure.yml
+      - .github/workflows/build-bicep.yml
 
 jobs:
   detect-changes:
