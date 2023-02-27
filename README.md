@@ -6,6 +6,9 @@ CI/CD pipeline is implemented using [GitHub actions](.github/workflows) for both
 
 Application builds a React static web app, which talks to a bunch of APIs hosted via [Azure API Management](https://azure.microsoft.com/en-us/products/api-management/) and talking to azure functions written in kotlin, Azure storage and Azure Cosmo DB and Azure Cognitive services as backends. Feature of web application itself is simple. Since that is not the main purpose here. User can basically upload an image with a metadata. Then if user want, they can try uploading another image from another flow, and try to find face in it. If it's found in Cosmo DB, then we return the metadata.
 
+Demos:
+
+- :closed_lock_with_key Identity-based connections instead of secrets with triggers and bindings
 
 # Architecture diagram for the application
 
