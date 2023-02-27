@@ -17,23 +17,23 @@ jobs:
       OS: ${{ matrix.os }}
       NODE_VERSION: ${{ matrix.node-version }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install
-      working-directory: ./frontend
-      run: npm ci --legacy-peer-deps
-    - name: Build
-      working-directory: ./frontend
-      run: npm run build --if-present
-    - name: Test
-      working-directory: ./frontend
-      run: npm test 
-    if: ${{ inputs.upload-artifact-key != '' }}
-    - name: Artifact build folder for deploy
-      uses: actions/upload-artifact@v3
-      with:
-        name: website
-        path: frontend/build/
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install
+        working-directory: ./frontend
+        run: npm ci --legacy-peer-deps
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build --if-present
+      - name: Test
+        working-directory: ./frontend
+        run: npm test 
+      if: ${{ inputs.upload-artifact-key != '' }}
+      - name: Artifact build folder for deploy
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.upload-artifact-key }}
+          path: frontend/build/
