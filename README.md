@@ -8,7 +8,14 @@ Application builds a React static web app, which talks to a bunch of APIs hosted
 
 Demos:
 
-- :closed_lock_with_key: Identity-based connections instead of secrets with triggers and bindings
+- :computer_mouse: One click deploy with [GitHub Actions](https://github.com/features/actions)
+- :closed_lock_with_key: [Identity-based connections instead of secrets with triggers and bindings](https://learn.microsoft.com/en-us/azure/azure-functions/functions-identity-based-connections-tutorial-2)
+- :recycle: [Reusing workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows)
+- :dash: [Serverless application architectures using Event Grid](https://learn.microsoft.com/en-us/azure/architecture/solution-ideas/articles/serverless-application-architectures-using-event-grid)
+- :tada: [GitHub Actions using environments for deployment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
+- :shield: [GitHub Actions Azure login action with OpenID Connect](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-openid-connect)
+- :dependabot: [Dependabot auto approve and merge on successfull checks](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions)
+
 
 # Architecture diagram for the application
 
