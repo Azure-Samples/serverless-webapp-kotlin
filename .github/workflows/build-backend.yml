@@ -1,4 +1,4 @@
-name: Build frontend
+name: Build backend
 
 on:
   pull_request:
@@ -9,5 +9,5 @@ on:
       - "!backend/bicep/**"
 
 jobs:
-  build-react-app:
+  build-java-app:
     uses: ./.github/workflows/build-maven-project.yml

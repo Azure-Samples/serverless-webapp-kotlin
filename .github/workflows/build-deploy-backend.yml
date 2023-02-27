@@ -47,7 +47,7 @@ jobs:
             az logout
       if: always()
 
-  build-maven-app:
+  build-java-app:
     needs: get-function-app-name
     uses: ./.github/workflows/build-maven-project.yml
     with:
@@ -56,7 +56,7 @@ jobs:
 
   deploy-azure-functions:
     environment: ${{ vars.DEFAULT_ENVIRONMENT }}
-    needs: [get-function-app-name, build-maven-app]
+    needs: [get-function-app-name, build-java-app]
     runs-on: ubuntu-latest
     name: Deploy azure functions
     env:
