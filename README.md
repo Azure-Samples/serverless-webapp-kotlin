@@ -60,17 +60,17 @@ Given [pre requisite](#pre-requisite) are already configured, lets get started t
 
 # Deploy core infrastructure resources
 
-In core infra setup, resources which are common to both frontend and backend are deployed. Primarily this is used to create a resource group where both frontend and backend resources will be created. If you plan to configure custom domain name for the app, Azure DNS zone can also be created.
+1. In core infra setup, resources which are common to both frontend and backend are deployed. Primarily this is used to create a resource group where both frontend and backend resources will be created. If you plan to configure custom domain name for the app, Azure DNS zone can also be created.
 
-```bash
-az deployment sub create -f core/bicep/main.bicep -n core-infra -p resourceGroup=$RESOURCE_GROUP location=$AZURE_REGION dnsZoneName=$DNS_ZONE
-```
+    ```bash
+    az deployment sub create -f core/bicep/main.bicep -n core-infra -p resourceGroup=$RESOURCE_GROUP location=$AZURE_REGION dnsZoneName=$DNS_ZONE
+    ```
 
-If DNS Zone is specified for custom domain, update your DNS registrar with created DNS zone name server info. You can get name server info by running below command.
+2. !!OPTIONAL!! If DNS Zone is specified for custom domain, update your DNS registrar with created DNS zone name server info. You can get name server info by running below command.
 
-```bash
-az network dns zone show --name $DNS_ZONE -o jsonc
-```
+    ```bash
+    az network dns zone show --name $DNS_ZONE -o jsonc
+    ```
 
 # Deploy frontend infrastructure and application
 
