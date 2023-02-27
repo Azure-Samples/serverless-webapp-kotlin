@@ -8,7 +8,7 @@ Application builds a React static web app, which talks to a bunch of APIs hosted
 
 Demos:
 
-- :closed_lock_with_key Identity-based connections instead of secrets with triggers and bindings
+- :closed_lock_with_key: Identity-based connections instead of secrets with triggers and bindings
 
 # Architecture diagram for the application
 
