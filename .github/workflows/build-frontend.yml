@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "frontend/**"
+      - ".github/workflows/build-frontend.yml"
+      - ".github/workflows/build-react-app.yml"
       - "!frontend/bicep/**"
 
 jobs:

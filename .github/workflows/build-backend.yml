@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "backend/**"
+      - ".github/workflows/build-backend.yml"
+      - ".github/workflows/build-maven-project.yml"
       - "!backend/bicep/**"
 
 jobs:
