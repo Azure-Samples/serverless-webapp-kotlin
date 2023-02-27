@@ -4,7 +4,6 @@ type Config = {
 }
 
 export const GLOBAL_CONSTANTS = new Map<string, Config>();
-
 GLOBAL_CONSTANTS.set('JAVA', {
         'FIND_IMAGE': `https://api.pankaagr.cloud/face/find-person?code=ac536dd50bc24dd9b3f0b3ffe4e28962`,
         'UPLOAD_URL': `https://api.pankaagr.cloud/face/upload-url?code=ac536dd50bc24dd9b3f0b3ffe4e28962`,
