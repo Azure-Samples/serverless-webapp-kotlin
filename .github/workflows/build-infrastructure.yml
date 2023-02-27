@@ -45,7 +45,7 @@ jobs:
     if: ${{ needs.detect-changes.outputs.frontend == 'true' }}
     uses: ./.github/workflows/build-bicep.yml
     with:
-      bicep-files: "['frontend/bicep/main.bicep}']"
+      bicep-files: "['frontend/bicep/main.bicep']"
 
   core:
     needs: detect-changes
