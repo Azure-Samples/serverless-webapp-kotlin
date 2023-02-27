@@ -1,0 +1,14 @@
+name: Build frontend
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - frontend/**
+    paths-ignore:
+      - frontend/bicep/**
+
+jobs:
+  build-react-app:
+    uses: ./.github/workflows/build-react-app.yml
