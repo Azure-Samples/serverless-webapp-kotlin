@@ -24,7 +24,7 @@ jobs:
 
   deploy:
     environment: ${{ vars.DEFAULT_ENVIRONMENT }}
-    needs: build
+    needs: build-react-app
     runs-on: ubuntu-latest
     name: Deploy to azure storage
     steps:
