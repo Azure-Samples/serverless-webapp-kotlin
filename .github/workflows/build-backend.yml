@@ -19,7 +19,7 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest   
     permissions:
-      pull_requests: write
+      pull-requests: write
     steps:
       - name: Approve a PR
         run: |
