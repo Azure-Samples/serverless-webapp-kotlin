@@ -5,7 +5,9 @@ on:
     branches:
       - main
     paths:
-      - backend/bicep/**
+      - "backend/bicep/**"
+      - "!backend/bicep/eventSubscription.bicep"
+      - "!backend/bicep/apimManagedCert.bicep"
   workflow_dispatch:
 
 env:
