@@ -1,0 +1,13 @@
+name: Build backend
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - "!backend/bicep/**"
+
+jobs:
+  build-java-app:
+    uses: ./.github/workflows/build-maven-project.yml

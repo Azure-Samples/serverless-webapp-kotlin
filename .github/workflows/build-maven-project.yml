@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      upload-artifact-key:
+        required: false
+        type: string
+      app-name:
+        required: false
+        type: string
+        default: "pr-build"
+jobs:
+  build:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          java-version: [11.0.x]
+      name: Build with Java ${{ matrix.java-version }}
+      env:
+        OS: ${{ matrix.os }}
+        JAVA_VERSION: ${{ matrix.java-version }}
+        FN_APP_NAME: ${{ inputs.app-name }}
+      steps:
+      - uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.java-version }}
+      - name: Build and Test
+        working-directory: ./backend/FaceApp
+        run: mvn clean install -DappName=$FN_APP_NAME
+      - name: Artifact folder for deploy
+        if: ${{ inputs.upload-artifact-key != '' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: .
+

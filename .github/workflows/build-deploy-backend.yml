@@ -4,7 +4,8 @@ on:
     push:
       branches: [ main ]
       paths:
-        - backend/FaceApp/**
+        - "backend/FaceApp/**"
+        - "backend/bicep/eventSubscription.bicep"
     workflow_dispatch:
 
 env:
@@ -41,39 +42,21 @@ jobs:
         inlineScript: |
           FN_APP_NAME=$(az functionapp list -o tsv --query [*].name)
           echo "FN_APP_NAME=$FN_APP_NAME" >> $GITHUB_OUTPUT 
-  build:
-    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
-    runs-on: ubuntu-latest
-    needs: get-function-app-name
-    strategy:
-      max-parallel: 4
-      matrix:
-        java-version: [11.0.x]
-    name: Build with Java ${{ matrix.java-version }}
-    env:
-      OS: ${{ matrix.os }}
-      JAVA_VERSION: ${{ matrix.java-version }}
-      FN_APP_NAME: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup Java
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'zulu'
-        java-version: ${{ matrix.java-version }}
-    - name: Build and Test
-      working-directory: ./backend/FaceApp
-      run: mvn clean install -DappName=$FN_APP_NAME
+    - name: logout
+      run: |
+            az logout
+      if: always()
 
-    - name: Artifact folder for deploy
-      uses: actions/upload-artifact@v3
-      with:
-        name: app
-        path: .
+  build-java-app:
+    needs: get-function-app-name
+    uses: ./.github/workflows/build-maven-project.yml
+    with:
+      upload-artifact-key: app
+      app-name: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
 
   deploy-azure-functions:
     environment: ${{ vars.DEFAULT_ENVIRONMENT }}
-    needs: [get-function-app-name, build]
+    needs: [get-function-app-name, build-java-app]
     runs-on: ubuntu-latest
     name: Deploy azure functions
     env:
