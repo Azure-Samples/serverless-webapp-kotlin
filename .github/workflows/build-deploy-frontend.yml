@@ -5,8 +5,7 @@ on:
     branches: [ main ]
     paths:
       - frontend/**
-    paths-ignore:
-      - frontend/bicep/**
+      - "!frontend/bicep/**"
   workflow_dispatch:
 
 env:

@@ -5,9 +5,8 @@ on:
     branches:
       - main
     paths:
-      - frontend/**
-    paths-ignore:
-      - frontend/bicep/**
+      - "frontend/**"
+      - "!frontend/bicep/**"
 
 jobs:
   build-react-app:
