@@ -1,3 +1,4 @@
+name: Reusable workflow to build react app using npm
 on:
   workflow_call:
     inputs:

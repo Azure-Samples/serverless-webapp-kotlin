@@ -1,3 +1,4 @@
+name: Reusable workflow to build maven project
 on:
   workflow_call:
     inputs:
