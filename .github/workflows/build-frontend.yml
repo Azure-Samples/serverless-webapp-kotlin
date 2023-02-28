@@ -22,6 +22,8 @@ jobs:
       pull-requests: write
       contents: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1
