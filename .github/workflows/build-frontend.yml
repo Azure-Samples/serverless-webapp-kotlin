@@ -21,6 +21,11 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - name: Dependabot metadata
+          id: metadata
+          uses: dependabot/fetch-metadata@v1
+          with:
+            github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Approve a PR
         run: |
           gh pr checkout "$PR_URL" # sets the upstream metadata for `gh pr status`
