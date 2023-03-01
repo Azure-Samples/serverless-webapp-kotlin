@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/backend/FaceApp"
+    schedule:
+      interval: "daily"
+    labels:
+      - "maven"
+      - "dependencies"
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"

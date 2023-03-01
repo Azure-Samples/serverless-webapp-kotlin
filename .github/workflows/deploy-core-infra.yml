@@ -1,0 +1,57 @@
+name: Deploy core infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - core/bicep/**
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  DNS_ZONE: ${{ vars.DNS_ZONE }}
+  AZURE_REGION: ${{ vars.AZURE_REGION }}
+  BICEP_FILE_PATH: core/bicep
+  BICEP_FILE_NAME: main
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  core-infra-deployment:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    name: Build and Deploy core infrastructure bicep templates
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Set default region and resource group for cli
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
+    - name: Validate core infra bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az deployment sub validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p resourceGroup=${{ env.RESOURCE_GROUP }} location=${{ env.AZURE_REGION }} dnsZoneName=${{ env.DNS_ZONE }}
+          az bicep upgrade
+          az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+    - name: Deploy core infrastructure
+      id: coreInfraDeployment
+      uses: azure/arm-deploy@v1
+      with:
+        deploymentName: 'via-github-core-infra-${{ github.run_number }}'
+        scope: subscription
+        region: ${{ env.AZURE_REGION }}
+        template: ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.json  # Set this to the location of your template file
+        parameters: resourceGroup=${{ env.RESOURCE_GROUP }} location=${{ env.AZURE_REGION }} dnsZoneName=${{ env.DNS_ZONE }}
+

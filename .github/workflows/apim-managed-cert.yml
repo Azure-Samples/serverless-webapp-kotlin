@@ -1,0 +1,63 @@
+name: Configure DNS Zone for APIM Managed Cert Custom domain
+on:
+  workflow_dispatch:
+    inputs:
+      TXT_HASH:
+        description: 'TXT Hash value displayed on APIM Custom domain Managed Cert page on azure portal'
+        required: true
+
+env:
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
+  TXT_HASH: ${{ github.event.inputs.TXT_HASH }}
+  DNS_ZONE: ${{ vars.DNS_ZONE }}
+  AZURE_REGION: ${{ vars.AZURE_REGION }}
+  BICEP_FILE_PATH: backend/bicep
+  BICEP_FILE_NAME: apimManagedCert
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  apim-cert-dns-config:
+    environment: ${{ vars.DEFAULT_ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    name: Configure DNS zone to prepare for APIM Managed cert
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    - name: Set default region and resource group for cli
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
+    - name: Get APIM name in the resource group ${{ env.RESOURCE_GROUP }}
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          APIM=$(az apim list -o tsv --query "[*].name")
+
+          echo APIM=$APIM >> $GITHUB_ENV
+    - name: Validate APIM dns config bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az deployment group validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p dnsZoneName=${{ env.DNS_ZONE }} apimName=${{ env.APIM }} txtHash=${{ env.TXT_HASH }}
+          az bicep upgrade
+          az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
+    - name: Configure DNS zone for APIM Cert
+      id: dnsZoneConfiguration
+      uses: azure/arm-deploy@v1
+      with:
+        deploymentName: 'via-github-apim-dns-zone-config-${{ github.run_number }}'
+        resourceGroupName: ${{ env.RESOURCE_GROUP }}
+        region: ${{ env.AZURE_REGION }}
+        template: ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.json
+        parameters: dnsZoneName=${{ env.DNS_ZONE }} apimName=${{ env.APIM }} txtHash=${{ env.TXT_HASH }}
+
