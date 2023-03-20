@@ -114,6 +114,8 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
+          # https://github.com/Azure/azure-cli/issues/25710
+          az config set bicep.use_binary_from_path=false
           az deployment group validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p storageAccountName=${{ env.IMAGE_STORAGE }} functionApp=${{ env.FN_APP_NAME }} devSubscriptionUrl=
           az bicep upgrade
           az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
