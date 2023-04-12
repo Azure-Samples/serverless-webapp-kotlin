@@ -8,6 +8,10 @@ on:
       - "!frontend/bicep/**"
   workflow_dispatch:
 
+concurrency:
+  group: "frontend"
+  cancel-in-progress: true
+
 env:
   AZURE_REGION: ${{ vars.AZURE_REGION }}
   RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}

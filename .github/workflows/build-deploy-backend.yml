@@ -8,6 +8,10 @@ on:
         - "backend/bicep/eventSubscription.bicep"
     workflow_dispatch:
 
+concurrency:
+  group: "backend"
+  cancel-in-progress: true
+
 env:
   RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
   AZURE_REGION: ${{ vars.AZURE_REGION }}
