@@ -10,6 +10,10 @@ on:
       - ".github/workflows/build-react-app.yml"
       - "!frontend/bicep/**"
 
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-react-app:
     uses: ./.github/workflows/build-react-app.yml
