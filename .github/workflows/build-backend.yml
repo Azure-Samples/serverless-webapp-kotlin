@@ -23,11 +23,11 @@ jobs:
     if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:
-#      - name: Dependabot metadata
-#        id: metadata
-#        uses: dependabot/fetch-metadata@v1
-#        with:
-#          github-token: "${{ secrets.DEPENDABOT_TOKEN }}"
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.DEPENDABOT_TOKEN }}"
       - uses: actions/checkout@v3
       - name: Approve a PR
         run: |
