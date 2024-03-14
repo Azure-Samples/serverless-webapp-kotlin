@@ -13,3 +13,8 @@ updates:
       interval: "daily"
     labels:
       - "dependencies"
+    groups:
+      npm:
+        update-types:
+          - "minor"
+          - "patch"
