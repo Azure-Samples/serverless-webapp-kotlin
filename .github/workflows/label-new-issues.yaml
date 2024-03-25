@@ -9,6 +9,9 @@ on:
 env:
   ISSUE_OWNER: pankajagrawal16
 
+permissions:
+  issues: write
+
 jobs:
     label:
         runs-on: ubuntu-latest
