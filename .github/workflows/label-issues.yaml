@@ -8,7 +8,8 @@ on:
     types: [opened]
 
 env:
-    ISSUE_OWNER: octocat
+  # read from repository variable
+    ISSUE_OWNER: ${{ vars.ISSUE_OWNER }}
 
 permissions:
     issues: write
