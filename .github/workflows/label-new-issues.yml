@@ -1,0 +1,79 @@
+name: Label Newly open issues with label called triage
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+    issues: write
+    contents: read
+
+env:
+    OWNER: ${{ secrets.OWNER }}
+
+jobs:
+    triage:
+        runs-on: ubuntu-latest
+        name: Label newly opened issues
+        steps:
+        - name: Label newly opened issues
+          uses: actions/github-script@v3
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+                const issue = context.payload.issue;
+                const issueNumber = issue.number;
+                const repo = context.repo.repo;
+                const owner = context.repo.owner;
+                const issueTitle = issue.title;
+                const issueBody = issue.body;
+                const issueLabels = issue.labels;
+                const triageLabel = 'triage';
+                const triageLabelColor = 'FF0000';
+                const triageLabelDescription = 'Issues that need triage';
+                const triageLabelExists = issueLabels.find(label => label.name === triageLabel);
+                if (!triageLabelExists) {
+                await github.issues.createLabel({
+                    owner,
+                    repo,
+                    name: triageLabel,
+                    color: triageLabelColor,
+                    description: triageLabelDescription
+                });
+                }
+                await github.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: [triageLabel]
+                });
+
+      # add a comment on the issue to let the user know that the issue has been labeled as a new job
+    add-comment:
+        runs-on: ubuntu-latest
+        name: Add comment to issue
+        steps:
+        - name: Add comment to issue
+          uses: actions/github-script@v3
+          with:
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              script: |
+                const issue = context.payload.issue;
+                const issueNumber = issue.number;
+                const repo = context.repo.repo;
+                const owner = context.repo.owner;
+                const issueTitle = issue.title;
+                const issueBody = issue.body;
+                const issueLabels = issue.labels;
+                const triageLabel = 'triage';
+                const triageLabelExists = issueLabels.find(label => label.name === triageLabel);
+                
+                if (triageLabelExists) {
+                    await github.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: issueNumber,
+                    body: `Thanks for opening this issue! We have added the triage label to this issue.`
+                    });
+                }
+
