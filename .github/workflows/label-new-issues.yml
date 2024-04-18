@@ -51,6 +51,7 @@ jobs:
       # add a comment on the issue to let the user know that the issue has been labeled as a new job
     add-comment:
         runs-on: ubuntu-latest
+        needs: triage
         name: Add comment to issue
         steps:
         - name: Add comment to issue
