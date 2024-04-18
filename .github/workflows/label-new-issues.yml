@@ -29,8 +29,6 @@ jobs:
                 const issueBody = issue.body;
                 const issueLabels = issue.labels;
                 const triageLabel = 'triage';
-                const triageLabelColor = 'FF0000';
-                const triageLabelDescription = 'Issues that need triage';
                 const triageLabelExists = issueLabels.find(label => label.name === triageLabel);
                 if (!triageLabelExists) {
                   await github.issues.addLabels({
@@ -57,18 +55,11 @@ jobs:
                 const issueNumber = issue.number;
                 const repo = context.repo.repo;
                 const owner = context.repo.owner;
-                const issueTitle = issue.title;
-                const issueBody = issue.body;
-                const issueLabels = issue.labels;
-                const triageLabel = 'triage';
-                const triageLabelExists = issueLabels.find(label => label.name === triageLabel);
                 
-                if (triageLabelExists) {
-                    await github.issues.createComment({
-                    owner,
-                    repo,
-                    issue_number: issueNumber,
-                    body: `Thanks for opening this issue! We have added the triage label to this issue.`
-                    });
-                }
+                await github.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: `Thanks for opening this issue! We have added the triage label to this issue.`
+                });
 
