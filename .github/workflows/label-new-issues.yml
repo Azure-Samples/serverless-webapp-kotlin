@@ -33,20 +33,14 @@ jobs:
                 const triageLabelDescription = 'Issues that need triage';
                 const triageLabelExists = issueLabels.find(label => label.name === triageLabel);
                 if (!triageLabelExists) {
-                await github.issues.createLabel({
-                    owner,
-                    repo,
-                    name: triageLabel,
-                    color: triageLabelColor,
-                    description: triageLabelDescription
-                });
+                  await github.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: issueNumber,
+                  labels: [triageLabel]
+                  });
                 }
-                await github.issues.addLabels({
-                owner,
-                repo,
-                issue_number: issueNumber,
-                labels: [triageLabel]
-                });
+                
 
       # add a comment on the issue to let the user know that the issue has been labeled as a new job
     add-comment:
