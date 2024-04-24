@@ -38,5 +38,7 @@ jobs:
               script: |
                 github.issues.addAssignees({
                   issue_number: context.issue.number,
-                  assignees: [context.payload.issue.user.login]
+                  assignees: [context.payload.issue.user.login],
+                  owner: context.repo.owner,
+                  repo: context.repo.repo
                 })
