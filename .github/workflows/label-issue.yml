@@ -1,0 +1,35 @@
+# Label newly opened issues with label called triage
+
+name: Label Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+    triage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Label Issue
+              uses: actions/github-script@0.9.0
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      github.issues.addLabels({
+                          issue_number: context.issue.number,
+                          labels: ['triage']
+                      })
+
+    # assign the issue to the person who opened it
+    assign:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Assign Issue
+              uses: actions/github-script@0.9.0
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      github.issues.addAssignees({
+                          issue_number: context.issue.number,
+                          assignees: [context.payload.issue.user.login]
+                      })
