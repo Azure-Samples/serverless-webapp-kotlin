@@ -7,13 +7,13 @@
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.27",
-    "@types/react": "^18.2.65",
-    "@types/react-dom": "^18.2.22",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
     "react-scripts": "^5.0.1",
-    "typescript": "~5.1.6"
+    "typescript": "~5.4.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,8 +42,8 @@
     "@types/react-router-dom": "^5.3.3",
     "node-sass": "^9.0.0",
     "react-images-upload": "^1.2.8",
-    "react-router": "^6.4.3",
-    "react-router-dom": "^6.22.3",
+    "react-router": "^6.23.0",
+    "react-router-dom": "^6.23.0",
     "request": "^2.88.2",
     "npmlog": "^7.0.1"
   },
