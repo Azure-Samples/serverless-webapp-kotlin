@@ -33,7 +33,7 @@ jobs:
     name: Deploy to azure storage
     steps:
     - name: Download artifact for deploy
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: website
     - name: Azure login
