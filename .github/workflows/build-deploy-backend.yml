@@ -29,18 +29,18 @@ jobs:
       FN_APP_NAME: ${{ steps.getFunctionAppName.outputs.FN_APP_NAME}}
     steps:
     - name: Azure login
-      uses: azure/login@v1
+      uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Set default region and resource group for cli
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       with:
         inlineScript: |
           az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
     - name: Get function app name
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       id: getFunctionAppName
       with:
         inlineScript: |
@@ -67,11 +67,11 @@ jobs:
       FN_APP_NAME: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
     steps:
     - name: Download artifact for deploy
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         name: app
     - name: Azure login
-      uses: azure/login@v1
+      uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -97,25 +97,25 @@ jobs:
       FN_APP_NAME: ${{ needs.get-function-app-name.outputs.FN_APP_NAME}}
     steps:
     - name: Azure login
-      uses: azure/login@v1
+      uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Set default region and resource group for cli
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       with:
         inlineScript: |
           az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
     - name: Get image storage name
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       with:
         inlineScript: |
           IMAGE_STORAGE=$(az storage account list -o tsv --query "[?starts_with(name, 'istoreapp')]|[0].name")
           echo "IMAGE_STORAGE=$IMAGE_STORAGE" >> $GITHUB_ENV
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
     - name: Validate event subscription bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       with:
         inlineScript: |
           # https://github.com/Azure/azure-cli/issues/25710
@@ -125,7 +125,7 @@ jobs:
           az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
     - name: Deploy event subscription with storage ${{ env.IMAGE_STORAGE }} and function app ${{ env.FN_APP_NAME }}
       id: backendInfraDeployment
-      uses: azure/arm-deploy@v1
+      uses: azure/arm-deploy@65ae74fb7aec7c680c88ef456811f353adae4d06 # v1.0.9
       with:
         deploymentName: 'via-github-event-subscription-${{ github.run_number }}'
         resourceGroupName: ${{ env.RESOURCE_GROUP }}

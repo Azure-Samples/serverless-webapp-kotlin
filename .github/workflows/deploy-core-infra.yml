@@ -26,20 +26,20 @@ jobs:
     name: Build and Deploy core infrastructure bicep templates
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
     - name: Azure login
-      uses: azure/login@v1
+      uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Set default region and resource group for cli
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       with:
         inlineScript: |
           az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
     - name: Validate core infra bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
-      uses: azure/CLI@v1
+      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
       with:
         inlineScript: |
           az deployment sub validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p resourceGroup=${{ env.RESOURCE_GROUP }} location=${{ env.AZURE_REGION }} dnsZoneName=${{ env.DNS_ZONE }}
@@ -47,7 +47,7 @@ jobs:
           az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
     - name: Deploy core infrastructure
       id: coreInfraDeployment
-      uses: azure/arm-deploy@v1
+      uses: azure/arm-deploy@65ae74fb7aec7c680c88ef456811f353adae4d06 # v1.0.9
       with:
         deploymentName: 'via-github-core-infra-${{ github.run_number }}'
         scope: subscription
