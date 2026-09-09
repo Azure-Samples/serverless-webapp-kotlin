@@ -25,27 +25,27 @@ jobs:
     name: Configure DNS zone to prepare for APIM Managed cert
     steps:
     - name: Checkout
-      uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: Azure login
-      uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1.6.1
+      uses: azure/login@7ddb5af1ef8758cf1353cf3b42f940aee27ba21c # v3.0.2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Set default region and resource group for cli
-      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
+      uses: azure/CLI@9eb25b8360668fb0ecbafa808d40e2197b2f5f52 # v3.0.0
       with:
         inlineScript: |
           az config set defaults.location=${{ env.AZURE_REGION }} defaults.group=${{ env.RESOURCE_GROUP }}
     - name: Get APIM name in the resource group ${{ env.RESOURCE_GROUP }}
-      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
+      uses: azure/CLI@9eb25b8360668fb0ecbafa808d40e2197b2f5f52 # v3.0.0
       with:
         inlineScript: |
           APIM=$(az apim list -o tsv --query "[*].name")
 
           echo APIM=$APIM >> $GITHUB_ENV
     - name: Validate APIM dns config bicep file  ${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
-      uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
+      uses: azure/CLI@9eb25b8360668fb0ecbafa808d40e2197b2f5f52 # v3.0.0
       with:
         inlineScript: |
           az deployment group validate --template-file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep -p dnsZoneName=${{ env.DNS_ZONE }} apimName=${{ env.APIM }} txtHash=${{ env.TXT_HASH }}
@@ -53,7 +53,7 @@ jobs:
           az bicep build --file ./${{ env.BICEP_FILE_PATH }}/${{ env.BICEP_FILE_NAME }}.bicep
     - name: Configure DNS zone for APIM Cert
       id: dnsZoneConfiguration
-      uses: azure/arm-deploy@65ae74fb7aec7c680c88ef456811f353adae4d06 # v1.0.9
+      uses: azure/arm-deploy@a1361c2c2cd398621955b16ca32e01c65ea340f5 # v2.0.0
       with:
         deploymentName: 'via-github-apim-dns-zone-config-${{ github.run_number }}'
         resourceGroupName: ${{ env.RESOURCE_GROUP }}
