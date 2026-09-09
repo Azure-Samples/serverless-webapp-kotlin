@@ -13,9 +13,9 @@ jobs:
       matrix:
         file: ${{ fromJson(inputs.bicep-files) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
       - name: Validate ${{ inputs.bicep-file }}
-        uses: azure/CLI@v1
+        uses: azure/CLI@4db43908b9df2e7ac93c8275a8f9a448c59338dd # v1.0.9
         with:
           inlineScript: |
             az bicep upgrade
