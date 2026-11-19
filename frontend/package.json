@@ -43,7 +43,7 @@
     "node-sass": "^9.0.0",
     "react-images-upload": "^1.2.8",
     "react-router": "^6.28.0",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^7.1.1",
     "request": "^2.88.2",
     "npmlog": "^7.0.1"
   },
